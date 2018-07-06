@@ -29,8 +29,8 @@ args = parser.parse_args()
 
 # Defrag and shrink the vmdk-files
 print("[+] Defragging and shrinking disk.")
-# run("vmware-vdiskmanager -d '{}'".format(args.vmdk))
-# run("vmware-vdiskmanager -k '{}'".format(args.vmdk))
+run("vmware-vdiskmanager -d '{}'".format(args.vmdk))
+run("vmware-vdiskmanager -k '{}'".format(args.vmdk))
 
 # Add all other files which should be packed into the box
 # See vagrant box documentation

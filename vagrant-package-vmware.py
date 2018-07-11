@@ -27,10 +27,15 @@ parser.add_argument(
     default=".")
 args = parser.parse_args()
 
+path, filename = os.path.split(args.vmx)
+os.chdir(path)
+vm_name = re.match("(.*)\.vmx", filename).group(1) # TODO Match to end
+
+
 # Defrag and shrink the vmdk-files
 print("[+] Defragging and shrinking disk.")
-run("vmware-vdiskmanager -d '{}'".format(args.vmdk))
-run("vmware-vdiskmanager -k '{}'".format(args.vmdk))
+run("vmware-vdiskmanager -d '{}.vmdk'".format(vm_name))
+run("vmware-vdiskmanager -k '{}.vmdk'".format(vm_name))
 
 # Add all other files which should be packed into the box
 # See vagrant box documentation
@@ -44,11 +49,7 @@ box_file = tarfile.open(
     compresslevel=args.compresslevel
 )
 
-path, filename = os.path.split(args.vmx)
-os.chdir(path)
 box_file.add(filename)
-
-vm_name = re.match("(.*)\.vmx", filename).group(1) # TODO Match to end
 box_file.add("{}.nvram".format(vm_name))
 box_file.add("{}.vmsd".format(vm_name))
 box_file.add("{}.vmxf".format(vm_name))
@@ -77,7 +78,6 @@ re_vmdk = re.compile(
     re_name)
 
 # Add the VMDK itself
-print(args.vmdk)
 if args.vmdk == None:
     main_vmdk = "{}.vmdk".format(vm_name)
 else:
@@ -85,7 +85,6 @@ else:
     os.chdir(path)
     main_vmdk = filename
 
-print(main_vmdk)
 box_file.add(main_vmdk)
 
 # Add all sub-files
